@@ -2,6 +2,12 @@ export default function PP() {
     return <div>
         <h1>Privacy Policy</h1>
         <h2>How we use your Google data</h2>
-        <p>Keeping it simple without all the legal talk: We only keep your Email address and pair it with a uses count. Thats basically it</p>
+        <p>We do absolutely nothing with it other checking that you are logged in by email</p>
+
+        <h2>How we use your Questions</h2>
+        <p>READ CAREFULLY:</p>
+        <p>Your questions are sent to a webhook TO DISCORD. This is to make sure that out app is WORKING. What we see is your question and the AI's response</p>
+        <img src={"/tmessage.png"}/>
+        <p>This is what we see exactly</p>
     </div>
 }
