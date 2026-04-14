@@ -8,8 +8,8 @@ export const limit = {
 }
 
 export function getData() {
-    const stateStr = readFileSync(path.join(process.cwd(), "lib", "db.json"), "utf-8")
-    const state = JSON.parse(stateStr) as { isFree: boolean, tokenUsage: { free: number, paid: number } }
+    // @ts-ignore
+    const state = (globalThis.state ||  { isFree: true, tokenUsage: { free: 0, paid: 0 } }) as { isFree: boolean, tokenUsage: { free: number, paid: number } }
     return state
 }
 
@@ -36,12 +36,14 @@ export function iStillCanPay(tokens: number) {
 export function toggleTokenType() {
     const state = {...getData()}
     state.isFree = !state.isFree
-    writeFileSync(path.join(process.cwd(), "lib", "db.json"), JSON.stringify(state))
+    // @ts-ignore
+    globalThis.state = state
 }
 
 export function appendUsedTokens(tokens: number) {
     const state = {...getData()}
     const envName = state.isFree ? "free" : "paid"
     state.tokenUsage[envName] += tokens
-    writeFileSync(path.join(process.cwd(), "lib", "db.json"), JSON.stringify(state))
+    // @ts-ignore
+    globalThis.state = state
 }
