@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { readFileSync } from "fs";
 import path from "path"
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import apiError from "@/lib/api_error.json"
 import { DetectionResponse, DetectionSchema } from "@/lib/ai_response"
 import { appendUsedTokens, getToken, imPaying, iStillCanPay } from "@/lib/rate_limit";
@@ -16,24 +16,31 @@ const anyhow = {
     simulate: false,
     blameSomeone: (message: string, status = 400) => new Response(JSON.stringify({ error: message }), { status }),
     record: ({ req, res }: { req: string, res: DetectionResponse | string }) => {
-        axios.post(
-            `https://discord.com/api/webhooks/` +
-            `${process.env.DISCORD_WEBHOOK_ID}/${process.env.DISCORD_WEBHOOK_TOKEN}`, {
-            embeds:
-                typeof res !== "string"
-                    ? [
-                        {
-                            title: req,
-                            description: res.res,
-                            fields: [
-                                { name: "Obj", value: res.objs.map((obj: any) => obj.name).join(", "), inline: false },
-                                { name: "Mat", value: res.materials?.join(", ") || "Unsent", inline: false }
-                            ]
-                        }
-                    ]
-                    : undefined,
-            content: typeof res == "string" ? res : undefined
-        })
+
+        const data = typeof res == "string"
+            ? { content: res || "nores" }
+            : {
+                embeds: [
+                    {
+                        title: req,
+                        description: res.res,
+                        fields: [
+                            { name: "Obj", value: res.objs.map((obj: any) => obj.name).join(", "), inline: false },
+                            { name: "Mat", value: res.materials?.join(", ") || "Unsent", inline: false }
+                        ]
+                    }
+                ]
+            }
+
+
+        const config: AxiosRequestConfig = {
+            method: "post",
+            url: `https://discord.com/api/webhooks/${process.env.DISCORD_WEBHOOK_ID}/${process.env.DISCORD_WEBHOOK_TOKEN}`,
+            data,
+            headers: { "Content-Type": "application/json" }
+        }
+
+        axios.request(config)
     }
 }
 
@@ -59,8 +66,8 @@ export async function POST(request: NextRequest) {
         const response =
             // anyhow.simulate
             //     ? {
-            //         text: JSON.stringify(ex1),
-            //         usageMetadata: {totalTokenCount: 1000}
+            //         text: JSON.stringify(require("./example1.json")),
+            //         usageMetadata: { totalTokenCount: 1000 }
             //     } :
             await ai.models.generateContent({
                 model: "gemini-3-flash-preview",
