@@ -11,7 +11,7 @@ export default function NotFound() {
                 <div className="p-2 bg-background-2 w-full rounded-2xl flex-1">
                     <div className="flex justify-center items-center h-svh flex-col">
                         <h1>404</h1>
-                        <p>Inability to inable to ablility finding RECYCULTISTs</p>
+                        <p>Page not found. Ether you typed wrong, i deleted the folder or sth else idk</p>
                     </div>
                 </div>
             </div>
